@@ -20,4 +20,5 @@ Please adhere to the following guidelines to make sure the program doesn't crash
 
 ## Current Functions
 
-* Calculates the probability of starting with a card in your oppening hand (e.g. Talonflame STM)
+* Calculates the probability of starting with each Basic Pokemon in your deck
+* Calculates the probability of starting with any given combination of Basic Pokemon in your deck
