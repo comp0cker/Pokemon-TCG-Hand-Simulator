@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <random>
+#include <algorithm>
 #include <vector>
 using namespace std;
 
@@ -13,8 +14,14 @@ int readDeck(string[], vector<string>&);
 int constructHand(string[], string[]);
 int checkMulligan(string[], string);
 int checkHand(string[], string);
+int Sort(vector<string>&, vector<int>&);
 
 int checkStartingHand(string[], string[], vector<string>&);
+
+bool sortt(int i, int j) 
+{ 
+	return (i>j);
+}
 
 int main()
 {
@@ -109,34 +116,48 @@ int checkHand(string hand_cards[], string subject)
 	return 0;
 }
 
+int Sort(vector<string> &str, vector<int> &in)
+{
+	for (int i = 0; i < in.size(); i++)
+	{
+		for (int j = 1; j < in.size(); j++)
+		{
+			if (in[j] > in[j - 1])
+			{
+				string temps;
+				int tempi;
+
+				temps = str[j - 1];
+				str[j - 1] = str[j];
+				str[j] = temps;
+
+				tempi = in[j - 1];
+				in[j - 1] = in[j];
+				in[j] = tempi;
+			}
+		}
+	}
+
+	return 0;
+}
+
 int checkStartingHand(string deck[], string hand[], vector<string> &basics)
 {
 	int trials, count = 0;
 	bool valid = false;
 	string subject_card;
 
-	cout << "Desired card: ";
-	cin >> subject_card;
+	vector<int> basicCount (basics.size(), 0);
+	vector<string> uniqueBasicCombs (1, "");
+	vector<int> uniqueBasicCombsCount;
 
-	for (int i = 0; i < DECK_SIZE; i++)
-		if (deck[i] == subject_card)
-			valid = true;
-
-	while (!valid)
-	{
-		system("cls");
-		cout << "The card " << subject_card << " is not in your deck.\n" << "Desired card: ";
-		cin >> subject_card;
-
-		for (int i = 0; i < DECK_SIZE; i++)
-			if (deck[i] == subject_card)
-				valid = true;
-	}
+	vector<string>::iterator it;
+	vector<int>::iterator itt;
 
 	cout << "Number of trials to run: ";
 	cin >> trials;
 
-	for (int i = 0; i < trials; i++)
+	for (int ii = 0; ii < trials; ii++)
 	{
 		constructHand(deck, hand);
 		
@@ -158,12 +179,90 @@ int checkStartingHand(string deck[], string hand[], vector<string> &basics)
 
 		cout << "\n";
 		*/
-		checkHand(hand, subject_card);
 
-		count += checkHand(hand, subject_card);
+		string temp = "";
+
+
+		for (int j = 0; j < basics.size(); j++)
+		{
+			temp += to_string(checkHand(hand, basics[j]));
+			basicCount[j] += checkHand(hand, basics[j]);
+		}
+
+		int cc = 0;
+
+		for (int k = 0; k < uniqueBasicCombs.size(); k++)
+		{
+			if (uniqueBasicCombs[k] == temp)
+			{
+				uniqueBasicCombsCount[k]++;
+				cc++;
+			}
+		}
+
+		if (cc == 0)
+		{
+			vector<string>::iterator it;
+			it = uniqueBasicCombs.begin();
+			it = uniqueBasicCombs.insert(it, temp);
+			uniqueBasicCombs.insert(it, 0, "");
+
+			vector<int>::iterator itt;
+			itt = uniqueBasicCombsCount.begin();
+			itt = uniqueBasicCombsCount.insert(itt, 1);
+			uniqueBasicCombsCount.insert(itt, 0, 0);
+		}
 	}
 
-	cout << "Out of " << trials << " starting hands, " << count << " included " << subject_card << " (" << 100 * float(count) / float(trials) << "%).\n";
+	cout << "\n";
+
+	vector<string> basicsCopy(basics);
+
+	Sort(basicsCopy, basicCount);
+
+	for (int i = 0; i < basics.size(); i++)
+	{
+		if (basicCount[i] == 1)
+			cout << basicCount[i] << " starting hand included " << basicsCopy[i] << " (" << float(basicCount[i]) * 100 / trials << "%)\n";
+
+		else
+			cout << basicCount[i] << " starting hands included " << basicsCopy[i] << " (" << float(basicCount[i]) * 100 / trials << "%)\n";
+	}
+	cout << "\n";
+
+	Sort(uniqueBasicCombs, uniqueBasicCombsCount);
+
+
+	for (int k = 0; k < uniqueBasicCombsCount.size(); k++)
+	{
+		if (uniqueBasicCombsCount[k] == 1)
+			cout << uniqueBasicCombsCount[k] << " starting hand included ";
+		else
+			cout << uniqueBasicCombsCount[k] << " starting hands included "; 
+
+		int z = 0;
+		for (int i = 0; i < basics.size(); i++)
+			if (uniqueBasicCombs[k].at(i) == '1')
+				z++;
+
+		if (z == 1)
+			cout << "only ";
+
+		string str = "";
+		
+		for (int i = 0; i < basics.size(); i++)
+			if (uniqueBasicCombs[k].at(i) == '1')
+				str += basics[i] + ", ";
+
+		str.pop_back();
+		str.pop_back();
+
+		cout << str;
+
+		cout << " (" << float(uniqueBasicCombsCount[k]) * 100 / float(trials) << "%)\n";
+	}
+
+	cout << "\n";
 
 	return 0;
 }
