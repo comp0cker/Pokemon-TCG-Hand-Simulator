@@ -1,6 +1,6 @@
-4 beedrill
+4 *beedrill
 3 m_beedrill
-4 talonflame
+4 *talonflame
 4 professor_sycamore
 4 n
 2 lysandre
