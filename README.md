@@ -15,7 +15,7 @@ Please adhere to the following guidelines to make sure the program doesn't crash
 4 *heatmor
 4 ether
 4 max_elixir
-4 fire_energy
+48 fire_energy
 ```
 
 ## Current Functions
