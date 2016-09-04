@@ -7,16 +7,19 @@
 using namespace std;
 
 #define DECK_SIZE 60
-#define HAND_SIZE 7
+#define HAND_SIZE 8
 #define PRIZES 6
 
-int readDeck(string[], vector<string>&);
-int constructHand(string[], vector<string>&);
+int readDeck(vector<string>&, vector<string>&);
+int resetDeck(vector<string>&);
+int constructHand(vector<string>&, vector<string>&);
+int layPrizes(vector<string>&);
 int checkMulligan(vector<string>&, string);
 int checkHand(vector<string>&, string);
 int Sort(vector<string>&, vector<int>&);
+int shuffleDeck(vector<string>&);
 
-int checkStartingHand(string[],vector<string>&, vector<string>&);
+int checkStartingHand(vector<string>&, vector<string>&, vector<string>&);
 
 bool sortt(int i, int j) 
 { 
@@ -25,7 +28,7 @@ bool sortt(int i, int j)
 
 int main()
 {
-	string deck[DECK_SIZE];
+	vector<string> deck (DECK_SIZE, "");
 	
 	vector<string> hand (HAND_SIZE, "");
 
@@ -43,12 +46,15 @@ int main()
 	system("pause");
 }
 
-int readDeck(string deck[], vector<string> &basics)
+int readDeck(vector<string> &deck, vector<string> &basics)
 {
 	ifstream inFile;
 	int dup, i;
 
 	inFile.open("deck.txt");
+
+	basics.clear();
+	resetDeck(deck);
 
 	for (i = 0; i < DECK_SIZE; 1)
 	{
@@ -79,22 +85,42 @@ int readDeck(string deck[], vector<string> &basics)
 	return 0;
 }
 
-int constructHand(string deck[], vector<string> &hand)
+int resetDeck(vector<string>& deck)
 {
-	int used[DECK_SIZE] = { 0 };
+	deck.clear();
+
+	for (int i = 0; i < DECK_SIZE; i++)
+		deck.push_back("");
+	return 0;
+}
+
+int constructHand(vector<string>& deck, vector<string> &hand)
+{
 	random_device rd;
 	srand(rd());
 
 	for (int i = 0; i < HAND_SIZE; i++)
 	{
-		int temp = rand() % DECK_SIZE;
-
-		while (used[temp] != 0)
-			temp = rand() % DECK_SIZE;
-
-		used[temp]++;
+		int temp = rand() % deck.size();
 
 		hand[i] = deck[temp];
+
+		deck.erase(deck.begin() + temp);
+	}
+
+	return 0;
+}
+
+int layPrizes(vector<string>& deck)
+{
+	random_device rd;
+	srand(rd());
+
+	for (int i = 0; i < PRIZES; i++)
+	{
+		int temp = rand() % deck.size();
+
+		deck.erase(deck.begin());
 	}
 
 	return 0;
@@ -143,7 +169,9 @@ int Sort(vector<string> &str, vector<int> &in)
 	return 0;
 }
 
-int checkStartingHand(string deck[], vector<string> &hand, vector<string> &basics)
+int shuffleDeck(vector<string> deck);
+
+int checkStartingHand(vector<string> &deck, vector<string> &hand, vector<string> &basics)
 {
 	int trials, count = 0;
 	bool valid = false;
@@ -160,14 +188,20 @@ int checkStartingHand(string deck[], vector<string> &hand, vector<string> &basic
 	cin >> trials;
 
 	for (int ii = 0; ii < trials; ii++)
-	{
-		constructHand(deck, hand);
-		
+	{	
 		int c = 0;
+		readDeck(deck, basics);
 
 		do
 		{
 			constructHand(deck, hand);
+
+			/*
+			for (int i = 0; i < HAND_SIZE; i++)		// Outputs hands
+			cout << hand[i] << "\t";
+
+			cout << "\n";
+			*/
 
 			c = 0;
 
@@ -175,12 +209,6 @@ int checkStartingHand(string deck[], vector<string> &hand, vector<string> &basic
 				if (checkMulligan(hand, basics[i]))
 					c++;
 		} while (c == 0);
-		/*
-		for (int i = 0; i < HAND_SIZE; i++)		// Outputs hands 
-			cout << hand[i] << "\t";
-
-		cout << "\n";
-		*/
 
 		string temp = "";
 
