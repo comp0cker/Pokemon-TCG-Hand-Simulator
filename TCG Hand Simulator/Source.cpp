@@ -12,12 +12,14 @@ using namespace std;
 
 int readDeck(vector<string>&, vector<string>&);
 int resetDeck(vector<string>&);
+
+int start(vector<string>&, vector<string>&, vector<string>&);
 int constructHand(vector<string>&, vector<string>&);
 int layPrizes(vector<string>&);
 int checkMulligan(vector<string>&, string);
+
 int checkHand(vector<string>&, string);
 int Sort(vector<string>&, vector<int>&);
-int shuffleDeck(vector<string>&);
 
 int checkStartingHand(vector<string>&, vector<string>&, vector<string>&);
 
@@ -29,18 +31,10 @@ bool sortt(int i, int j)
 int main()
 {
 	vector<string> deck (DECK_SIZE, "");
-	
 	vector<string> hand (HAND_SIZE, "");
-
 	vector<string> basics;
 
 	readDeck(deck, basics);
-	/*
-	constructHand(deck, hand);
-	
-	while (!checkMulligan(hand, "beedrill") && !checkMulligan(hand, "talonflame"))
-		constructHand(deck, hand);
-	*/
 	checkStartingHand(deck, hand, basics);
 	
 	system("pause");
@@ -94,6 +88,38 @@ int resetDeck(vector<string>& deck)
 	return 0;
 }
 
+int start(vector<string>& deck, vector<string> &hand, vector<string>& basics) // a combination of readDeck, constructHand, checkMulligan, and layPrizes
+{
+	int c = 0;
+
+	do
+	{
+		readDeck(deck, basics);
+		constructHand(deck, hand);
+
+		/*
+		for (int i = 0; i < HAND_SIZE; i++)		// Outputs hands
+		cout << hand[i] << "\t";				// Probably not in the right place :P
+
+		cout << "\n";
+		*/
+
+		c = 0;
+
+		for (int i = 0; i < basics.size(); i++)
+		{
+			if (checkMulligan(hand, basics[i]))
+				c++;
+			if (c)
+				break;
+		}
+	} while (c == 0);
+
+	layPrizes(deck);
+
+	return 0;
+}
+
 int constructHand(vector<string>& deck, vector<string> &hand)
 {
 	random_device rd;
@@ -111,7 +137,7 @@ int constructHand(vector<string>& deck, vector<string> &hand)
 	return 0;
 }
 
-int layPrizes(vector<string>& deck)
+int layPrizes(vector<string>& deck) // not yet implemented
 {
 	random_device rd;
 	srand(rd());
@@ -120,7 +146,7 @@ int layPrizes(vector<string>& deck)
 	{
 		int temp = rand() % deck.size();
 
-		deck.erase(deck.begin());
+		deck.erase(deck.begin() + temp);
 	}
 
 	return 0;
@@ -169,7 +195,7 @@ int Sort(vector<string> &str, vector<int> &in)
 	return 0;
 }
 
-int shuffleDeck(vector<string> deck);
+// random_shuffle (deck.begin(), deck.end()) is the shuffling algorithm
 
 int checkStartingHand(vector<string> &deck, vector<string> &hand, vector<string> &basics)
 {
@@ -189,26 +215,8 @@ int checkStartingHand(vector<string> &deck, vector<string> &hand, vector<string>
 
 	for (int ii = 0; ii < trials; ii++)
 	{	
-		int c = 0;
-		readDeck(deck, basics);
-
-		do
-		{
-			constructHand(deck, hand);
-
-			/*
-			for (int i = 0; i < HAND_SIZE; i++)		// Outputs hands
-			cout << hand[i] << "\t";
-
-			cout << "\n";
-			*/
-
-			c = 0;
-
-			for (int i = 0; i < basics.size(); i++)
-				if (checkMulligan(hand, basics[i]))
-					c++;
-		} while (c == 0);
+		cout << "\rComputing trial " << ii << " out of " << trials << "...";
+		start(deck, hand, basics);
 
 		string temp = "";
 
@@ -244,7 +252,7 @@ int checkStartingHand(vector<string> &deck, vector<string> &hand, vector<string>
 		}
 	}
 
-	cout << "\n";
+	cout << "\rDone!                                             \n";
 
 	vector<string> basicsCopy(basics);
 
