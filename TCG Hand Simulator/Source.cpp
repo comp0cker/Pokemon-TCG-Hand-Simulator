@@ -11,12 +11,12 @@ using namespace std;
 #define PRIZES 6
 
 int readDeck(string[], vector<string>&);
-int constructHand(string[], string[]);
-int checkMulligan(string[], string);
-int checkHand(string[], string);
+int constructHand(string[], vector<string>&);
+int checkMulligan(vector<string>&, string);
+int checkHand(vector<string>&, string);
 int Sort(vector<string>&, vector<int>&);
 
-int checkStartingHand(string[], string[], vector<string>&);
+int checkStartingHand(string[],vector<string>&, vector<string>&);
 
 bool sortt(int i, int j) 
 { 
@@ -25,7 +25,9 @@ bool sortt(int i, int j)
 
 int main()
 {
-	string deck[DECK_SIZE], hand[HAND_SIZE];
+	string deck[DECK_SIZE];
+	
+	vector<string> hand (HAND_SIZE, "");
 
 	vector<string> basics;
 
@@ -77,7 +79,7 @@ int readDeck(string deck[], vector<string> &basics)
 	return 0;
 }
 
-int constructHand(string deck[], string hand[])
+int constructHand(string deck[], vector<string> &hand)
 {
 	int used[DECK_SIZE] = { 0 };
 	random_device rd;
@@ -98,7 +100,7 @@ int constructHand(string deck[], string hand[])
 	return 0;
 }
 
-int checkMulligan(string hand_cards[], string basic)
+int checkMulligan(vector<string> &hand_cards, string basic)
 {
 	for (int i = 0; i < HAND_SIZE; i++)
 		if (hand_cards[i] == basic)
@@ -107,7 +109,7 @@ int checkMulligan(string hand_cards[], string basic)
 	return 0;
 }
 
-int checkHand(string hand_cards[], string subject)
+int checkHand(vector<string> &hand_cards, string subject)
 {
 	for (int i = 0; i < HAND_SIZE; i++)
 		if (hand_cards[i] == subject)
@@ -141,7 +143,7 @@ int Sort(vector<string> &str, vector<int> &in)
 	return 0;
 }
 
-int checkStartingHand(string deck[], string hand[], vector<string> &basics)
+int checkStartingHand(string deck[], vector<string> &hand, vector<string> &basics)
 {
 	int trials, count = 0;
 	bool valid = false;
