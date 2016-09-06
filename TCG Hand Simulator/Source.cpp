@@ -7,9 +7,36 @@
 #include "cards.h"
 using namespace std;
 
+#ifdef _WIN32	// Required junk for the cursor
+
+#include <windows.h>
+
+void gotoxy(int x, int y)
+{
+	COORD p = { x, y };
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), p);
+}
+
+#else
+
+#include <unistd.h>
+#include <term.h>
+
+void gotoxy(int x, int y)
+{
+	int err;
+	if (!cur_term)
+		if (setupterm(NULL, STDOUT_FILENO, &err) == ERR)
+			return;
+	putp(tparm(tigetstr("cup"), y, x, 0, 0, 0, 0, 0, 0, 0));
+}
+
+#endif			// end of junk
+
 #define DECK_SIZE 60
 #define HAND_SIZE 8
 #define PRIZES 6
+#define SELECTION_MAX 1		// Number of items in the menu of the selection screen
 
 int readDeck(vector<string>&, vector<string>&);
 int resetDeck(vector<string>&);
@@ -35,8 +62,52 @@ int main()
 	vector<string> hand (HAND_SIZE, "");
 	vector<string> basics;
 
+	cout << "Welcome to the TCG Hand Simulator!\n"
+		 << "==================================\n\n"
+		 << ""
+		 << "Please choose a function to load.\n\n"
+		 << ""
+		 << "Basic Checker\n"
+		 << "Vileplume Start Checker";
+
+	int c = 0;											// Counter for the position of the arrow
+
+	gotoxy(35, c + 5);
+	cout << "<==";
+
+	while (!(GetAsyncKeyState(VK_RETURN) & SHRT_MAX))		// Keep checking for keypress as long as the Enter key hasn't been clicked
+	{
+		if (GetAsyncKeyState(VK_UP) & SHRT_MAX)
+		{
+			if (c != 0)
+			{
+				gotoxy(35, c + 5);
+				cout << "           ";
+				c--;
+				gotoxy(35, c + 5);
+				cout << "<==";
+			}
+		}
+
+		else if (GetAsyncKeyState(VK_DOWN) & SHRT_MAX)
+		{
+			if (c != SELECTION_MAX)
+			{
+				gotoxy(35, c + 5);
+				cout << "           ";
+				c++;
+				gotoxy(35, c + 5);
+				cout << "<==";
+			}
+		}
+	}
+
 	readDeck(deck, basics);
-	checkStartingHand(deck, hand, basics);
+
+	if (c == 0)
+		checkStartingHand(deck, hand, basics);
+	else if (c == 1)
+		cout << "\nOOPS! NOT PROGRAMMED YET!\n";
 	
 	system("pause");
 }
@@ -80,7 +151,7 @@ int readDeck(vector<string> &deck, vector<string> &basics)
 	return 0;
 }
 
-int resetDeck(vector<string>& deck)
+int resetDeck(vector<string>& deck)		// I don't believe this is ever used, but whatever man :P
 {
 	deck.clear();
 
@@ -210,6 +281,8 @@ int checkStartingHand(vector<string> &deck, vector<string> &hand, vector<string>
 
 	vector<string>::iterator it;
 	vector<int>::iterator itt;
+
+	system("cls");
 
 	cout << "Number of trials to run: ";
 	cin >> trials;
