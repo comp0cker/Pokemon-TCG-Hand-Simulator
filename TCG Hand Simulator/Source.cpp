@@ -4,6 +4,7 @@
 #include <random>
 #include <algorithm>
 #include <vector>
+#include "cards.h"
 using namespace std;
 
 #define DECK_SIZE 60
