@@ -1,0 +1,6 @@
+{
+  "name": "Pokemon TCG Hand Simulator",
+  "tagline": "A program that simulates hands and such for the Pokemon TCG!",
+  "body": "### Welcome to the Pokemon TCG Hand Simulator\r\nI really need a better name for this.\r\n\r\nAnyways, this program can be used for multiple different functions! The only function at the time is to analyze numerous hands for the basic Pokemon in your deck, i.e. tell you how likely it is you'll start with certain Pokemon in your hand. The second function (not yet implemented) will allow you to calculate the probability of getting a Vileplume AOR out on your first turn.",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
