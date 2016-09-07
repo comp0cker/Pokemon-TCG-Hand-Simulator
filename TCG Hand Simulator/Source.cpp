@@ -50,6 +50,7 @@ int checkHand(vector<string>&, string);
 int Sort(vector<string>&, vector<int>&);
 
 int checkStartingHand(vector<string>&, vector<string>&, vector<string>&);
+int vileSetup(vector<string>&, vector<string>&);
 
 bool sortt(int i, int j) 
 { 
@@ -118,6 +119,13 @@ int readDeck(vector<string> &deck, vector<string> &basics)
 	int dup, i;
 
 	inFile.open("deck.txt");
+
+	if (inFile.fail())
+	{
+		cout << "\n\n\ndeck.txt not found!!\n";
+		system("pause");
+		exit(1);
+	}
 
 	basics.clear();
 	resetDeck(deck);
@@ -375,6 +383,13 @@ int checkStartingHand(vector<string> &deck, vector<string> &hand, vector<string>
 	}
 
 	cout << "\n";
+
+	return 0;
+}
+
+int vileSetup(vector<string> &deck, vector<string> &hand)
+{
+
 
 	return 0;
 }
