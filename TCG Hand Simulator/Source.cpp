@@ -50,7 +50,7 @@ int checkHand(vector<string>&, string);
 int Sort(vector<string>&, vector<int>&);
 
 int checkStartingHand(vector<string>&, vector<string>&, vector<string>&);
-int vileSetup(vector<string>&, vector<string>&);
+int vileSetup(vector<string>&, vector<string>&, vector<string>&);
 
 bool sortt(int i, int j) 
 { 
@@ -108,7 +108,7 @@ int main()
 	if (c == 0)
 		checkStartingHand(deck, hand, basics);
 	else if (c == 1)
-		cout << "\nOOPS! NOT PROGRAMMED YET!\n";
+		vileSetup(deck, hand, basics);
 	
 	system("pause");
 }
@@ -116,7 +116,7 @@ int main()
 int readDeck(vector<string> &deck, vector<string> &basics)
 {
 	ifstream inFile;
-	int dup, i;
+	int dup, i, c = 0;
 
 	inFile.open("deck.txt");
 
@@ -138,6 +138,7 @@ int readDeck(vector<string> &deck, vector<string> &basics)
 
 		if (deck[i].find("*") == 0)
 		{
+			c += dup;
 			deck[i].erase(0, 1);
 
 			vector<string>::iterator it;
@@ -156,7 +157,7 @@ int readDeck(vector<string> &deck, vector<string> &basics)
 			i++;
 	}
 
-	return 0;
+	return c;
 }
 
 int resetDeck(vector<string>& deck)		// I don't believe this is ever used, but whatever man :P
@@ -205,7 +206,7 @@ int constructHand(vector<string>& deck, vector<string> &hand)
 	random_device rd;
 	srand(rd());
 
-	for (int i = 0; i < HAND_SIZE; i++)
+	for (int i = 0; i < hand.size(); i++)
 	{
 		int temp = rand() % deck.size();
 
@@ -234,7 +235,7 @@ int layPrizes(vector<string>& deck) // not yet implemented
 
 int checkMulligan(vector<string> &hand_cards, string basic)
 {
-	for (int i = 0; i < HAND_SIZE; i++)
+	for (int i = 0; i < hand_cards.size(); i++)
 		if (hand_cards[i] == basic)
 			return 1;
 
@@ -243,7 +244,7 @@ int checkMulligan(vector<string> &hand_cards, string basic)
 
 int checkHand(vector<string> &hand_cards, string subject)
 {
-	for (int i = 0; i < HAND_SIZE; i++)
+	for (int i = 0; i < hand_cards.size(); i++)
 		if (hand_cards[i] == subject)
 			return 1;
 
@@ -387,9 +388,46 @@ int checkStartingHand(vector<string> &deck, vector<string> &hand, vector<string>
 	return 0;
 }
 
-int vileSetup(vector<string> &deck, vector<string> &hand)
+int vileSetup(vector<string> &deck, vector<string> &hand, vector<string> &basics)
 {
+	int trials;
+	vector<string> pokemon{ "Vileplume_AOR", "Gloom_AOR", "Oddish_AOR" };
 
+	system("cls");
+
+	cout << "Number of trials to run: ";
+	cin >> trials;
+
+	for (int ii = 0; ii < trials; ii++)
+	{
+		cout << "\rComputing trial " << ii << " out of " << trials << "...";
+		start(deck, hand, basics);
+
+		vector<int> pos;
+
+		for (int j = 0; j < hand.size(); j++)		// Cycles through the hand
+		{
+			if (hand[j] == "Oddish_AOR")
+				if (checkHand(hand, basics[j]))
+				{
+					pokemon.pop_back();
+					//priorities.pop_back();
+				}
+
+			for (int i = 0; i < basics.size(); i++)		
+			if (hand[j] == basics[i])
+				{
+					hand.erase(hand.begin() + j);
+					j--;
+					break;
+				}
+		}
+
+		for (int i = hand.size(); i < HAND_SIZE; i++)
+			hand.push_back("");
+	}
+
+	cout << "\rDone!                                             \n";
 
 	return 0;
 }
