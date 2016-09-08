@@ -391,6 +391,7 @@ int checkStartingHand(vector<string> &deck, vector<string> &hand, vector<string>
 int vileSetup(vector<string> &deck, vector<string> &hand, vector<string> &basics)
 {
 	int trials;
+	vector<string> priorities{ "Trainers_Mail", "Gloom_AOR", "Acro_Bike", "Shaymin_ROS", "Oddish_AOR", "Forest_Of_Giant_Plants" };
 	vector<string> pokemon{ "Vileplume_AOR", "Gloom_AOR", "Oddish_AOR" };
 
 	system("cls");
@@ -408,11 +409,7 @@ int vileSetup(vector<string> &deck, vector<string> &hand, vector<string> &basics
 		for (int j = 0; j < hand.size(); j++)		// Cycles through the hand
 		{
 			if (hand[j] == "Oddish_AOR")
-				if (checkHand(hand, basics[j]))
-				{
-					pokemon.pop_back();
-					//priorities.pop_back();
-				}
+				pokemon.erase(pokemon.begin() + 2);
 
 			for (int i = 0; i < basics.size(); i++)		
 			if (hand[j] == basics[i])
@@ -423,8 +420,14 @@ int vileSetup(vector<string> &deck, vector<string> &hand, vector<string> &basics
 				}
 		}
 
+		if (play("Forest_Of_Giant_Plants", hand))
+			hand.erase(hand.begin() + play("Forest_Of_Giant_Plants", hand));
+
 		for (int i = hand.size(); i < HAND_SIZE; i++)
 			hand.push_back("");
+
+		for (int i = 0; i < hand.size(); i++)
+			cout << "\n" << hand[i] << "\n";
 	}
 
 	cout << "\rDone!                                             \n";
