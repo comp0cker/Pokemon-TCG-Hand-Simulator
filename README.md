@@ -12,20 +12,22 @@ Please adhere to the following guidelines to make sure the program doesn't crash
 
 If you are using the Vileplume Start function, please format the following cards as follows:
 
-| Card           | Syntax           |
-| ---------------|:----------------:|
-| Shaymin-EX     | `Shaymin-EX_ROS` |
-| Shaymin-EX     | `Shaymin-EX_ROS` |
-| Shaymin-EX     | `Shaymin-EX_ROS` |
-| Unown          | `Unown_AOR`      |
-| Trainer's Mail | `Trainers_Mail`  |
-| Ultra Ball     | `Ultra_Ball`     |
-| Acro Bike      | `Acro_Bike`      |
+| Card                   | Syntax                   |
+| -----------------------|:------------------------:|
+| Oddish                 | `Oddish_AOR`             |
+| Gloom                  | `Gloom_AOR`              | 
+| Vileplume              | `Vileplume_AOR`          |
+| Shaymin-EX             | `Shaymin-EX_ROS`         |
+| Unown                  | `Unown_AOR`              |
+| Professor Sycamore     | `Professor_Sycamore`     |
+| N                      | `N`                      |
+| Trainer's Mail         | `Trainers_Mail`          |
+| Ultra Ball             | `Ultra_Ball`             |
+| Level Ball             | `Level_Ball`             |
+| Acro Bike              | `Acro_Bike`              |
+| Forest of Giant Plants | `Forest_Of_Giant_Plants` |
 
-Shaymin-EX:     
-Unown AOR:      `Unown_AOR`
-Trainer's Mail: `Trainers_Mail`
-Acro Bike:      `Acro_Bike`
+*If all of the above cards are not named as written, the program may crash and/or burn.*
 
 ### Example deck.txt
 
