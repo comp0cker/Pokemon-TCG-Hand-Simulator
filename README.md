@@ -12,8 +12,17 @@ Please adhere to the following guidelines to make sure the program doesn't crash
 
 If you are using the Vileplume Start function, please format the following cards as follows:
 
+| Card           | Syntax           |
+| ---------------|:----------------:|
+| Shaymin-EX     | `Shaymin-EX_ROS` |
+| Shaymin-EX     | `Shaymin-EX_ROS` |
+| Shaymin-EX     | `Shaymin-EX_ROS` |
+| Unown          | `Unown_AOR`      |
+| Trainer's Mail | `Trainers_Mail`  |
+| Ultra Ball     | `Ultra_Ball`     |
+| Acro Bike      | `Acro_Bike`      |
 
-Shaymin-EX:     `Shaymin-EX_ROS`
+Shaymin-EX:     
 Unown AOR:      `Unown_AOR`
 Trainer's Mail: `Trainers_Mail`
 Acro Bike:      `Acro_Bike`
