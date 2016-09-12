@@ -29,6 +29,24 @@ int Sort(vector<int> &str, vector<int> &in)
 	return 0;
 }
 
+int draw(vector<string> &deck, vector<string> &hand)
+{
+	string card = deck[deck.size() - 1];
+
+	deck.pop_back();
+	hand.push_back(card);
+
+	return 0;
+}
+
+int play(string subject, vector<string> &hand)
+{
+	for (int i = 0; i < hand.size(); i++)
+		if (hand[i] == subject)
+			return i;
+	return 0;
+}
+
 int sycamore(vector<string> &deck, vector<string> &hand)
 {
 	hand.clear();								// Discards your hand
@@ -162,12 +180,6 @@ int ultraBall(vector<string> &deck, vector<string> &hand, vector<string> &priori
 
 int levelBall(vector<string> &deck, vector<string> &hand, vector<string> &priorities, vector<string> &pokemon)
 {
-	vector<int> cardPriorities(hand.size(), 0);
-	vector<int> numbers;
-
-	for (int i = 0; i < hand.size(); i++)				// Defining numbers
-		numbers.push_back(i);
-
 	/*
 	This function doesn't need to discard cards from hand, because that's what Level Ball does!
 	*/

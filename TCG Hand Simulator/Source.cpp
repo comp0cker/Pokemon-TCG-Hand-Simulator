@@ -51,6 +51,7 @@ int Sort(vector<string>&, vector<int>&);
 
 int checkStartingHand(vector<string>&, vector<string>&, vector<string>&);
 int vileSetup(vector<string>&, vector<string>&, vector<string>&);
+int vileStartSequence(vector<string>&, vector<string>&, vector<string>&, vector<string>&, vector<string>&, vector<string>&, bool&, int&, int&);
 
 bool sortt(int i, int j) 
 { 
@@ -298,7 +299,7 @@ int checkStartingHand(vector<string> &deck, vector<string> &hand, vector<string>
 
 	for (int ii = 0; ii < trials; ii++)
 	{	
-		cout << "\rComputing trial " << ii << " out of " << trials << "...";
+		cout << "\rComputing trial " << ii + 1 << " out of " << trials << "...";
 		start(deck, hand, basics);
 
 		string temp = "";
@@ -391,8 +392,6 @@ int checkStartingHand(vector<string> &deck, vector<string> &hand, vector<string>
 int vileSetup(vector<string> &deck, vector<string> &hand, vector<string> &basics)
 {
 	int trials;
-	vector<string> priorities{ "Trainers_Mail", "Gloom_AOR", "Acro_Bike", "Shaymin_ROS", "Oddish_AOR", "Forest_Of_Giant_Plants" };
-	vector<string> pokemon{ "Vileplume_AOR", "Gloom_AOR", "Oddish_AOR" };
 
 	system("cls");
 
@@ -401,36 +400,131 @@ int vileSetup(vector<string> &deck, vector<string> &hand, vector<string> &basics
 
 	for (int ii = 0; ii < trials; ii++)
 	{
-		cout << "\rComputing trial " << ii << " out of " << trials << "...";
+		vector<string> priorities{ "Vileplume_AOR", "Trainers_Mail", "Gloom_AOR", "Acro_Bike", "Ultra Ball", "Level_Ball", "Shaymin_ROS", "Oddish_AOR", "Forest_Of_Giant_Plants" };
+		vector<string> pokemon{ "Vileplume_AOR", "Gloom_AOR", "Oddish_AOR" };
+		vector<string> trainers{ "Trainers_Mail", "Acro_Bike", "Ultra_Ball", "Level_Ball", "Forest_Of_Giant_Plants" };
+
+		cout << "\rComputing trial " << ii + 1 << " out of " << trials << "...";
 		start(deck, hand, basics);
 
 		vector<int> pos;
 
-		for (int j = 0; j < hand.size(); j++)		// Cycles through the hand
+		cout << "\nHAND BEFORE\n===========\n";
+
+		bool oddishFound = false;							// A boolean that stops the program from deleting the Oddish priority more than once
+		bool ifForest = false;
+		int pokemonCount = 0, shayminCount = 0, unownCount = 0;
+		string activePokemon = "null";
+
+		for (int j = 0; j < hand.size(); j++)				// Cycles through the hand
 		{
-			if (hand[j] == "Oddish_AOR")
-				pokemon.erase(pokemon.begin() + 2);
+			cout << hand[j] << "\n";						// Debugs hand before basics removed
+			if (hand[j] == "Oddish_AOR" && !oddishFound)
+			{
+				pokemon.erase(pokemon.begin() + 2);			// Erases Oddish from pokemon priorities vector
+				priorities.erase(priorities.begin() + 5);	// Erases Oddish from main priorities vector
+				cout << "\nODDISH FOUND!\n";
+				oddishFound = true;							// Keeps loop from searching for Oddish if Oddish is already in hand
+			}
 
 			for (int i = 0; i < basics.size(); i++)		
-			if (hand[j] == basics[i])
+			if (hand[j] == basics[i])						// Note: The first Pokemon found is your A
 				{
+					pokemonCount++;
 					hand.erase(hand.begin() + j);
 					j--;
+
+					if (basics[i] == "Unown_AOR")
+						unownCount++;
+					else if (basics[i] == "Shaymin-EX_ROS")
+						shayminCount++;
+					else
+						activePokemon = basics[i];
+
 					break;
 				}
 		}
 
-		if (play("Forest_Of_Giant_Plants", hand))
-			hand.erase(hand.begin() + play("Forest_Of_Giant_Plants", hand));
+		if (activePokemon == "null")						// If only Shaymin and Unown are available, make Unown be your Active
+		{
+			if (unownCount && shayminCount)
+				activePokemon = "Unown_AOR";
+			else if (unownCount > 0)
+				activePokemon = "Unown_AOR";
+			else if (shayminCount > 0)
+				activePokemon = "Shaymin-EX_ROS";
+		}
 
+		if (activePokemon == "Unown_AOR")					// If Unown is your active Pokemon, don't use it
+			unownCount--;
+
+		int DEBUG = unownCount;
+
+		cout << "\n\nACTIVE: " << activePokemon << "\nUnown Count: " << DEBUG << "\nShaymin Count: " << shayminCount << "\n\n";
+
+
+		cout << "\n\n";
+
+		vileStartSequence(deck, hand, basics, priorities, pokemon, trainers, ifForest, unownCount, shayminCount);
+
+		/*
+		cout << "\n";
+		for (int i = 0; i < priorities.size(); i++)			// DEBUG: Outputs the priority vector
+			cout << priorities[i] << "  ";
+		cout << "\n";
+		*/
+
+		cout << "\n";
+		for (int i = 0; i < pokemon.size(); i++)			// DEBUG: Outputs the pokemon vector (priorities for Pokemon only)
+			cout << pokemon[i] << "  ";
+		cout << "\n";
+		
+		cout << "HAND AFTER\n==========\n";
+		for (int i = 0; i < hand.size(); i++)				// DEBUG: Outputs your hand
+			cout << "\n" << hand[i] << "   ";
+		
 		for (int i = hand.size(); i < HAND_SIZE; i++)
 			hand.push_back("");
 
-		for (int i = 0; i < hand.size(); i++)
-			cout << "\n" << hand[i] << "\n";
+		cout << "\n";	// Debug
 	}
 
 	cout << "\rDone!                                             \n";
+
+	return 0;
+}
+
+int vileStartSequence(vector<string> &deck, vector<string> &hand, vector<string> &basics, vector<string> &priorities, vector<string> &pokemon, vector<string> &trainers, bool &ifForest, int &unownCount, int& shayminCount)
+{
+	for (int i = 0; i < unownCount; unownCount--)					// Play all benched Unowns to start off
+	{
+		draw(deck, hand);
+	}
+
+	if (play("Forest_Of_Giant_Plants", hand) && !ifForest)			// Play down Forest if one is not already played
+	{
+		hand.erase(hand.begin() + play("Forest_Of_Giant_Plants", hand));
+		priorities.erase(remove(priorities.begin(), priorities.end(), "Forest_Of_Giant_Plants"), priorities.end());
+		ifForest = true;
+	}
+
+	if (ifForest)
+		cout << "IF FOREST IS TRUE";
+	else
+		cout << "IF FOREST IS FALSE";
+
+	if (ifForest)
+	{
+		cout << "FOREST IS ACTIVE AHHHHHHH";
+		if (checkHand(hand, "Gloom_AOR") && pokemon.size() == 2)	// Evolve Oddish into Gloom if you have Gloom and there is an Oddish on the field
+		{
+			pokemon.erase(pokemon.begin() + 1);	
+			priorities.erase(remove(priorities.begin(), priorities.end(), "Gloom_AOR"), priorities.end());
+		}
+
+		if (checkHand(hand, "Vileplume_AOR") && pokemon.size() == 1)// Evolve Gloom into Vileplume if you have 
+			return 1;
+	}
 
 	return 0;
 }
