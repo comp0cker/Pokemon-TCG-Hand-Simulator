@@ -29,7 +29,7 @@ If you are using the Vileplume Start function, please format the following cards
 
 *If all of the above cards are not named as written, the program may crash and/or burn.*
 
-### Example deck.txt
+## Example deck.txt
 
 ```
 3 M_Audino-EX_FCO
@@ -64,3 +64,4 @@ If you are using the Vileplume Start function, please format the following cards
 
 * Calculates the probability of starting with each Basic Pokemon in your deck
 * Calculates the probability of starting with any given combination of Basic Pokemon in your deck
+* Calculates the probability of hitting a turn one item lock with Vileplume (**IN PROGRESS**)
