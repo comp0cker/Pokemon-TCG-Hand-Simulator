@@ -8,29 +8,15 @@ Please adhere to the following guidelines to make sure the program doesn't crash
 * The target deck should be the same directory as the excecutable, and named deck.txt
 * Indicate basic Pokemon by putting an asterisk directly before the Pokemon name (example shown below)
 * Start with the quantity of the card, followed by the name. 
-* Please capitalize the start of all new words in a card title
-* Please no 's or any other characters in card names
-* Please no empty lines or extra spaces in the front, middle, or end of the deck.txt file
-* Card names should be formatted as follows:
+* You can name your cards whatever you want, except for a select group of cards for the Vileplume Start Function(see below).
 
-```
-*Card_Name-EX_Set_SetNumber
-```
+If you are using the Vileplume Start function, please format the following cards as follows:
 
-The set number is only required when there are multiple cards with the same name and set in your deck.
 
-Here are some examples:
-
-```
-Shaymin-EX_ROS
-M_Rayquaza-EX_ROS
-M_Mewtwo_EX_BRT_64
-Professor_Sycamore
-Forest_Of_Giant_Plants
-Fire_Energy
-```
-
-* Indicate basic Pokemon by putting an asterisk directly before the Pokemon name (example shown below)
+Shaymin-EX:     `Shaymin-EX_ROS`
+Unown AOR:      `Unown_AOR`
+Trainer's Mail: `Trainers_Mail`
+Acro Bike:      `Acro_Bike`
 
 ### Example deck.txt
 
