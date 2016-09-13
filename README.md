@@ -65,3 +65,72 @@ If you are using the Vileplume Start function, please format the following cards
 * Calculates the probability of starting with each Basic Pokemon in your deck
 * Calculates the probability of starting with any given combination of Basic Pokemon in your deck
 * Calculates the probability of hitting a turn one item lock with Vileplume (**IN PROGRESS**)
+
+## Pseudocode for Vileplume Algorithm
+
+The program repeats a loop (function vileStartSequence) which does the following in order. The loop stops when there's no cards to play in hand:
+
+Plays all Unowns
+```
+	for (int i = 0; i < unownCount; unownCount--)
+		draw(deck, hand);
+```
+Plays all Trainer's Mails
+```
+	if (checkHand(hand, "Trainers_Mail"))
+		trainersMail(deck, hand, trainers);
+```
+Plays Forest of Giant Plants (if one is not already in play)
+```
+	if (play("Forest_Of_Giant_Plants", hand) && !ifForest)
+	{
+		hand.erase(hand.begin() + play("Forest_Of_Giant_Plants", hand));
+		priorities.erase(remove(priorities.begin(), priorities.end(), "Forest_Of_Giant_Plants"), priorities.end());
+		ifForest = true;
+	}
+```
+
+If there's no Oddish on the field, Level Ball for an Oddish
+
+```
+	if (checkHand(hand, "Level_Ball") && pokemon.size() == 3)
+	{
+		levelBall(deck, hand, pokemon);
+		hand.erase(hand.begin() + checkHand(hand, "Level_Ball") - 1);
+	}
+```
+
+If Forest of Giant Plants and Oddish are out, Level Ball for Gloom
+
+```
+	if (ifForest)
+	{
+		if (checkHand(hand, "Level_Ball") && pokemon.size() == 2)
+		{
+			levelBall(deck, hand, pokemon);
+			hand.erase(hand.begin() + checkHand(hand, "Level_Ball") - 1);
+		}
+	}
+```
+	
+If Oddish and Gloom are already on the field, use a Level Ball in hand for an Unown
+	
+	```
+		if (ifForest)
+	  {
+		  else if (checkHand(hand, "Level_Ball") && pokemon.size() == 1)
+		  for (int i = 0; i < deck.size(); i++)
+			  if (deck[i] == "Unown_AOR")
+				  {
+					  deck.erase(deck.begin() + i);
+					  hand.erase(hand.begin() + checkHand(hand, "Level_Ball") - 1);
+					  random_shuffle(deck.begin(), deck.end());
+					  draw(deck, hand);
+					  break;
+				  }
+		}
+	```
+
+If Gloom is in hand and Oddish is on the field, play Gloom
+
+If Vileplume is in hand and Gloom is on the field, play Vileplume
