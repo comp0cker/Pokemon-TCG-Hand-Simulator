@@ -245,9 +245,9 @@ int checkMulligan(vector<string> &hand_cards, string basic)
 
 int checkHand(vector<string> &hand_cards, string subject)
 {
-	for (int i = 0; i < hand_cards.size(); i++)
-		if (hand_cards[i] == subject)
-			return 1;
+	for (int i = 1; i < hand_cards.size() + 1; i++)
+		if (hand_cards[i - 1] == subject)
+			return i;
 
 	return 0;
 }
@@ -466,6 +466,7 @@ int vileSetup(vector<string> &deck, vector<string> &hand, vector<string> &basics
 		cout << "\n\n";
 
 		vileStartSequence(deck, hand, basics, priorities, pokemon, trainers, ifForest, unownCount, shayminCount);
+		vileStartSequence(deck, hand, basics, priorities, pokemon, trainers, ifForest, unownCount, shayminCount);
 
 		/*
 		cout << "\n";
@@ -497,9 +498,10 @@ int vileSetup(vector<string> &deck, vector<string> &hand, vector<string> &basics
 int vileStartSequence(vector<string> &deck, vector<string> &hand, vector<string> &basics, vector<string> &priorities, vector<string> &pokemon, vector<string> &trainers, bool &ifForest, int &unownCount, int& shayminCount)
 {
 	for (int i = 0; i < unownCount; unownCount--)					// Play all benched Unowns to start off
-	{
 		draw(deck, hand);
-	}
+
+	if (checkHand(hand, "Trainers_Mail"))
+		trainersMail(deck, hand, trainers);
 
 	if (play("Forest_Of_Giant_Plants", hand) && !ifForest)			// Play down Forest if one is not already played
 	{
@@ -508,22 +510,50 @@ int vileStartSequence(vector<string> &deck, vector<string> &hand, vector<string>
 		ifForest = true;
 	}
 
-	if (ifForest)
+	/*Play
+	if (ifForest)													// DEBUG: If IFFOREST = TRUE
 		cout << "IF FOREST IS TRUE";
 	else
 		cout << "IF FOREST IS FALSE";
+		*/
+
+
+
+
+
+
 
 	if (ifForest)
 	{
-		cout << "FOREST IS ACTIVE AHHHHHHH";
+		if (checkHand(hand, "Level_Ball") && pokemon.size() == 2)
+		{
+			levelBall(deck, hand, pokemon);
+			hand.erase(hand.begin() + checkHand(hand, "Level_Ball") - 1);
+		}
+
+		else if (checkHand(hand, "Level_Ball") && pokemon.size() == 1)
+			for (int i = 0; i < deck.size(); i++)
+				if (deck[i] == "Unown_AOR")								// If an Unown is in the deck and Oddish and Gloom are on the field, skip the crap and draw a card
+				{
+					deck.erase(deck.begin() + i);
+					hand.erase(hand.begin() + checkHand(hand, "Level_Ball") - 1);
+					random_shuffle(deck.begin(), deck.end());		// Shuffles the deck afterwards :]
+					draw(deck, hand);
+					break;
+				}
+		//cout << "FOREST IS ACTIVE AHHHHHHH";						// DEBUG: Rage I guess
 		if (checkHand(hand, "Gloom_AOR") && pokemon.size() == 2)	// Evolve Oddish into Gloom if you have Gloom and there is an Oddish on the field
 		{
-			pokemon.erase(pokemon.begin() + 1);	
+			//system("pause");										// DEBUG: Pauses when Gloom set up is in starting hand
+			pokemon.pop_back();	
 			priorities.erase(remove(priorities.begin(), priorities.end(), "Gloom_AOR"), priorities.end());
 		}
 
 		if (checkHand(hand, "Vileplume_AOR") && pokemon.size() == 1)// Evolve Gloom into Vileplume if you have 
+		{
+			system("pause");										// DEBUG: Pauses when Vileplume set up is in starting hand
 			return 1;
+		}
 	}
 
 	return 0;
