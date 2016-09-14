@@ -117,7 +117,7 @@ If Oddish and Gloom are already on the field, use a Level Ball in hand for an Un
 	
 	```
 		if (ifForest)
-	  {
+	  	{
 		  else if (checkHand(hand, "Level_Ball") && pokemon.size() == 1)
 		  for (int i = 0; i < deck.size(); i++)
 			  if (deck[i] == "Unown_AOR")
@@ -133,4 +133,26 @@ If Oddish and Gloom are already on the field, use a Level Ball in hand for an Un
 
 If Gloom is in hand and Oddish is on the field, play Gloom
 
+```
+	if (ifForest)
+	{
+		if (checkHand(hand, "Gloom_AOR") && pokemon.size() == 2)
+		{
+			pokemon.pop_back();	
+			priorities.erase(remove(priorities.begin(), priorities.end(), "Gloom_AOR"), priorities.end());
+		}
+	}
+```
+
 If Vileplume is in hand and Gloom is on the field, play Vileplume
+
+```
+	if (ifForest)
+	{
+		if (checkHand(hand, "Vileplume_AOR") && pokemon.size() == 1)// Evolve Gloom into Vileplume if you have 
+		{
+			system("pause");										// DEBUG: Pauses when Vileplume set up is in starting hand
+			return 1;
+		}
+	}
+```
