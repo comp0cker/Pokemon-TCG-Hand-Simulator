@@ -4,34 +4,10 @@
 #include <random>
 #include <algorithm>
 #include <vector>
-#include "cards.h"
-using namespace std;
-
-#ifdef _WIN32	// Required junk for the cursor
-
 #include <windows.h>
-
-void gotoxy(int x, int y)
-{
-	COORD p = { x, y };
-	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), p);
-}
-
-#else
-
-#include <unistd.h>
-#include <term.h>
-
-void gotoxy(int x, int y)
-{
-	int err;
-	if (!cur_term)
-		if (setupterm(NULL, STDOUT_FILENO, &err) == ERR)
-			return;
-	putp(tparm(tigetstr("cup"), y, x, 0, 0, 0, 0, 0, 0, 0));
-}
-
-#endif			// end of junk
+#include "cards.h"
+#include "gotoxy.h"
+using namespace std;
 
 #define DECK_SIZE 60
 #define HAND_SIZE 8
@@ -53,24 +29,19 @@ int checkStartingHand(vector<string>&, vector<string>&, vector<string>&);
 int vileSetup(vector<string>&, vector<string>&, vector<string>&);
 int vileStartSequence(vector<string>&, vector<string>&, vector<string>&, vector<string>&, vector<string>&, vector<string>&, bool&, int&, int&);
 
-bool sortt(int i, int j) 
-{ 
-	return (i>j);
-}
-
 int main()
 {
-	vector<string> deck (DECK_SIZE, "");
-	vector<string> hand (HAND_SIZE, "");
+	vector<string> deck(DECK_SIZE, "");
+	vector<string> hand(HAND_SIZE, "");
 	vector<string> basics;
 
 	cout << "Welcome to the TCG Hand Simulator!\n"
-		 << "==================================\n\n"
-		 << ""
-		 << "Please choose a function to load.\n\n"
-		 << ""
-		 << "Basic Checker\n"
-		 << "Vileplume Start Checker";
+		<< "==================================\n\n"
+		<< ""
+		<< "Please choose a function to load.\n\n"
+		<< ""
+		<< "Basic Checker\n"
+		<< "Vileplume Start Checker";
 
 	int c = 0;											// Counter for the position of the arrow
 
@@ -110,7 +81,7 @@ int main()
 		checkStartingHand(deck, hand, basics);
 	else if (c == 1)
 		vileSetup(deck, hand, basics);
-	
+
 	system("pause");
 }
 
@@ -277,16 +248,14 @@ int Sort(vector<string> &str, vector<int> &in)
 	return 0;
 }
 
-// random_shuffle (deck.begin(), deck.end()) is the shuffling algorithm
-
 int checkStartingHand(vector<string> &deck, vector<string> &hand, vector<string> &basics)
 {
 	int trials, count = 0;
 	bool valid = false;
 	string subject_card;
 
-	vector<int> basicCount (basics.size(), 0);
-	vector<string> uniqueBasicCombs (1, "");
+	vector<int> basicCount(basics.size(), 0);
+	vector<string> uniqueBasicCombs(1, "");
 	vector<int> uniqueBasicCombsCount;
 
 	vector<string>::iterator it;
@@ -298,7 +267,7 @@ int checkStartingHand(vector<string> &deck, vector<string> &hand, vector<string>
 	cin >> trials;
 
 	for (int ii = 0; ii < trials; ii++)
-	{	
+	{
 		cout << "\rComputing trial " << ii + 1 << " out of " << trials << "...";
 		start(deck, hand, basics);
 
@@ -360,7 +329,7 @@ int checkStartingHand(vector<string> &deck, vector<string> &hand, vector<string>
 		if (uniqueBasicCombsCount[k] == 1)
 			cout << uniqueBasicCombsCount[k] << " starting hand included ";
 		else
-			cout << uniqueBasicCombsCount[k] << " starting hands included "; 
+			cout << uniqueBasicCombsCount[k] << " starting hands included ";
 
 		int z = 0;
 		for (int i = 0; i < basics.size(); i++)
@@ -371,9 +340,9 @@ int checkStartingHand(vector<string> &deck, vector<string> &hand, vector<string>
 			cout << "only ";
 
 		string str = "";
-		
+
 		for (int i = 0; i < basics.size(); i++)
-			if (uniqueBasicCombs[k].at(i) == '1')
+			if (uniqueBasicCombs[k].at(i))
 				str += basics[i] + ", ";
 
 		str.pop_back();
@@ -409,7 +378,7 @@ int vileSetup(vector<string> &deck, vector<string> &hand, vector<string> &basics
 
 		vector<int> pos;
 
-		cout << "\nHAND BEFORE\n===========\n";
+		//cout << "\nHAND BEFORE\n===========\n";
 
 		bool oddishFound = false;							// A boolean that stops the program from deleting the Oddish priority more than once
 		bool ifForest = false;
@@ -418,17 +387,17 @@ int vileSetup(vector<string> &deck, vector<string> &hand, vector<string> &basics
 
 		for (int j = 0; j < hand.size(); j++)				// Cycles through the hand
 		{
-			cout << hand[j] << "\n";						// Debugs hand before basics removed
+			//cout << hand[j] << "\n";						// Debugs hand before basics removed
 			if (hand[j] == "Oddish_AOR" && !oddishFound)
 			{
 				pokemon.erase(pokemon.begin() + 2);			// Erases Oddish from pokemon priorities vector
 				priorities.erase(priorities.begin() + 5);	// Erases Oddish from main priorities vector
-				cout << "\nODDISH FOUND!\n";
+															//cout << "\nODDISH FOUND!\n";
 				oddishFound = true;							// Keeps loop from searching for Oddish if Oddish is already in hand
 			}
 
-			for (int i = 0; i < basics.size(); i++)		
-			if (hand[j] == basics[i])						// Note: The first Pokemon found is your A
+			for (int i = 0; i < basics.size(); i++)
+				if (hand[j] == basics[i])						// Note: The first Pokemon found is your A
 				{
 					pokemonCount++;
 					hand.erase(hand.begin() + j);
@@ -460,10 +429,10 @@ int vileSetup(vector<string> &deck, vector<string> &hand, vector<string> &basics
 
 		int DEBUG = unownCount;
 
-		cout << "\n\nACTIVE: " << activePokemon << "\nUnown Count: " << DEBUG << "\nShaymin Count: " << shayminCount << "\n\n";
+		//cout << "\n\nACTIVE: " << activePokemon << "\nUnown Count: " << DEBUG << "\nShaymin Count: " << shayminCount << "\n\n";
 
 
-		cout << "\n\n";
+		//cout << "\n\n";
 
 		vileStartSequence(deck, hand, basics, priorities, pokemon, trainers, ifForest, unownCount, shayminCount);
 		vileStartSequence(deck, hand, basics, priorities, pokemon, trainers, ifForest, unownCount, shayminCount);
@@ -471,23 +440,24 @@ int vileSetup(vector<string> &deck, vector<string> &hand, vector<string> &basics
 		/*
 		cout << "\n";
 		for (int i = 0; i < priorities.size(); i++)			// DEBUG: Outputs the priority vector
-			cout << priorities[i] << "  ";
+		cout << priorities[i] << "  ";
 		cout << "\n";
 		*/
-
+		/*
 		cout << "\n";
 		for (int i = 0; i < pokemon.size(); i++)			// DEBUG: Outputs the pokemon vector (priorities for Pokemon only)
-			cout << pokemon[i] << "  ";
+		cout << pokemon[i] << "  ";
 		cout << "\n";
-		
+		*/
+		/*
 		cout << "HAND AFTER\n==========\n";
 		for (int i = 0; i < hand.size(); i++)				// DEBUG: Outputs your hand
-			cout << "\n" << hand[i] << "   ";
-		
-		for (int i = hand.size(); i < HAND_SIZE; i++)
-			hand.push_back("");
+		cout << "\n" << hand[i] << "   ";
 
-		cout << "\n";	// Debug
+		for (int i = hand.size(); i < HAND_SIZE; i++)
+		hand.push_back("");
+		*/
+		//cout << "\n";	// Debug
 	}
 
 	cout << "\rDone!                                             \n";
@@ -499,6 +469,9 @@ int vileStartSequence(vector<string> &deck, vector<string> &hand, vector<string>
 {
 	for (int i = 0; i < unownCount; unownCount--)					// Play all benched Unowns to start off
 		draw(deck, hand);
+
+	if (checkHand(hand, "Acro_Bike"))
+		acroBike(deck, hand, priorities);
 
 	if (checkHand(hand, "Trainers_Mail"))
 		trainersMail(deck, hand, trainers);
@@ -512,16 +485,10 @@ int vileStartSequence(vector<string> &deck, vector<string> &hand, vector<string>
 
 	/*Play
 	if (ifForest)													// DEBUG: If IFFOREST = TRUE
-		cout << "IF FOREST IS TRUE";
+	cout << "IF FOREST IS TRUE";
 	else
-		cout << "IF FOREST IS FALSE";
-		*/
-
-
-
-
-
-
+	cout << "IF FOREST IS FALSE";
+	*/
 
 	if (ifForest)
 	{
@@ -545,16 +512,22 @@ int vileStartSequence(vector<string> &deck, vector<string> &hand, vector<string>
 		if (checkHand(hand, "Gloom_AOR") && pokemon.size() == 2)	// Evolve Oddish into Gloom if you have Gloom and there is an Oddish on the field
 		{
 			//system("pause");										// DEBUG: Pauses when Gloom set up is in starting hand
-			pokemon.pop_back();	
+			pokemon.pop_back();
 			priorities.erase(remove(priorities.begin(), priorities.end(), "Gloom_AOR"), priorities.end());
 		}
 
 		if (checkHand(hand, "Vileplume_AOR") && pokemon.size() == 1)// Evolve Gloom into Vileplume if you have 
 		{
-			system("pause");										// DEBUG: Pauses when Vileplume set up is in starting hand
+			//system("pause");										// DEBUG: Pauses when Vileplume set up is in starting hand
 			return 1;
 		}
 	}
+
+	if (checkHand(hand, "Ultra_Ball") && !checkHand(hand, "Professor_Sycamore") && !checkHand(hand, "N") && !checkHand(hand, "Ultra_Ball"))
+		ultraBall(deck, hand, priorities, "Shaymin-EX_ROS");
+
+	if (checkHand(hand, "Ultra_Ball") && (checkHand(hand, "Professor_Sycamore") || checkHand(hand, "N") || checkHand(hand, "Ultra_Ball")))
+		ultraBall(deck, hand, priorities, pokemon[pokemon.size - 1]);
 
 	return 0;
 }

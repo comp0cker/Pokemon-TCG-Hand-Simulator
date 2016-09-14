@@ -143,7 +143,7 @@ int trainersMail(vector<string> &deck, vector<string> &hand, vector<string> &tra
 	return 0;
 }
 
-int ultraBall(vector<string> &deck, vector<string> &hand, vector<string> &priorities, vector<string> &pokemon)
+int ultraBall(vector<string> &deck, vector<string> &hand, vector<string> &priorities, string pokemon)
 {
 	vector<int> cardPriorities(hand.size(), 0);
 	vector<int> numbers;
@@ -166,7 +166,7 @@ int ultraBall(vector<string> &deck, vector<string> &hand, vector<string> &priori
 
 	for (int i = 0; i < deck.size(); i++)				// Searches deck for the Pokemon with the highest priority (Oddish -> Gloom -> Vileplume) (vileplume, gloom, oddish)
 	{
-		if (deck[i] == pokemon[pokemon.size() - 1])		// If the deck has the highest prioritized Pokemon, take it
+		if (deck[i] == pokemon)		// If the deck has the highest prioritized Pokemon, take it
 		{
 			hand.push_back(deck[i]);					// Put card in hand
 			deck.erase(deck.begin() + i);				// Take card out from deck
@@ -178,7 +178,7 @@ int ultraBall(vector<string> &deck, vector<string> &hand, vector<string> &priori
 	return 0;
 }
 
-int levelBall(vector<string> &deck, vector<string> &hand, vector<string> &priorities, vector<string> &pokemon)
+int levelBall(vector<string> &deck, vector<string> &hand, vector<string> &pokemon)
 {
 	/*
 	This function doesn't need to discard cards from hand, because that's what Level Ball does!
@@ -191,12 +191,32 @@ int levelBall(vector<string> &deck, vector<string> &hand, vector<string> &priori
 	{
 		if (deck[i] == pokemon[pokemon.size() - 1])		// If the deck has the highest prioritized Pokemon, take it
 		{
-			hand.push_back(deck[i]);					// Put card in hand
+			pokemon.pop_back();					
+			/*
+			The card grabbed by the Level Ball is simply deleted from the pokemon priorities vector.
+			It does not need to be put into hand and then played, because all that does is pop back the pokemon
+			priorities vector.
+			*/
 			deck.erase(deck.begin() + i);				// Take card out from deck
 			random_shuffle(deck.begin(), deck.end());	// Shuffles the deck afterwards :]
 			break;										// Stops looping to save time
 		}
 	}
+
+	return 0;
+}
+
+int shaymin(vector<string>& deck, vector<string>& hand)	// shaymin, unlike other functions, will clear your hand of Shaymin-EX before drawing
+{
+	for (int i = 0; i < hand.size; i++)
+		if (play("Shaymin-EX_ROS", hand))
+		{
+			hand.erase(hand.begin() + play("Shaymin-EX_ROS", hand));
+			break;
+		}
+
+	for (int i = hand.size(); i < 6; i++)
+		draw(deck, hand);
 
 	return 0;
 }
