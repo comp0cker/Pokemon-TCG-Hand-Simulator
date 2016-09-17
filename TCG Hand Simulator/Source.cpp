@@ -266,13 +266,12 @@ int checkStartingHand(vector<string> &deck, vector<string> &hand, vector<string>
 	cout << "Number of trials to run: ";
 	cin >> trials;
 
+
 	for (int ii = 0; ii < trials; ii++)
 	{
 		cout << "\rComputing trial " << ii + 1 << " out of " << trials << "...";
-		start(deck, hand, basics);
 
 		string temp = "";
-
 
 		for (int j = 0; j < basics.size(); j++)
 		{
@@ -367,6 +366,8 @@ int vileSetup(vector<string> &deck, vector<string> &hand, vector<string> &basics
 	cout << "Number of trials to run: ";
 	cin >> trials;
 
+	int success = 0;
+
 	for (int ii = 0; ii < trials; ii++)
 	{
 		vector<string> priorities{ "Vileplume_AOR", "Trainers_Mail", "Gloom_AOR", "Acro_Bike", "Ultra Ball", "Level_Ball", "Shaymin_ROS", "Oddish_AOR", "Forest_Of_Giant_Plants" };
@@ -374,6 +375,7 @@ int vileSetup(vector<string> &deck, vector<string> &hand, vector<string> &basics
 		vector<string> trainers{ "Trainers_Mail", "Acro_Bike", "Ultra_Ball", "Level_Ball", "Forest_Of_Giant_Plants" };
 
 		cout << "\rComputing trial " << ii + 1 << " out of " << trials << "...";
+		
 		start(deck, hand, basics);
 
 		vector<int> pos;
@@ -385,58 +387,18 @@ int vileSetup(vector<string> &deck, vector<string> &hand, vector<string> &basics
 		int pokemonCount = 0, shayminCount = 0, unownCount = 0;
 		string activePokemon = "null";
 
-		for (int j = 0; j < hand.size(); j++)				// Cycles through the hand
-		{
-			//cout << hand[j] << "\n";						// Debugs hand before basics removed
-			if (hand[j] == "Oddish_AOR" && !oddishFound)
-			{
-				pokemon.erase(pokemon.begin() + 2);			// Erases Oddish from pokemon priorities vector
-				priorities.erase(priorities.begin() + 5);	// Erases Oddish from main priorities vector
-															//cout << "\nODDISH FOUND!\n";
-				oddishFound = true;							// Keeps loop from searching for Oddish if Oddish is already in hand
-			}
-
-			for (int i = 0; i < basics.size(); i++)
-				if (hand[j] == basics[i])						// Note: The first Pokemon found is your A
-				{
-					pokemonCount++;
-					hand.erase(hand.begin() + j);
-					j--;
-
-					if (basics[i] == "Unown_AOR")
-						unownCount++;
-					else if (basics[i] == "Shaymin-EX_ROS")
-						shayminCount++;
-					else
-						activePokemon = basics[i];
-
-					break;
-				}
-		}
-
-		if (activePokemon == "null")						// If only Shaymin and Unown are available, make Unown be your Active
-		{
-			if (unownCount && shayminCount)
-				activePokemon = "Unown_AOR";
-			else if (unownCount > 0)
-				activePokemon = "Unown_AOR";
-			else if (shayminCount > 0)
-				activePokemon = "Shaymin-EX_ROS";
-		}
-
-		if (activePokemon == "Unown_AOR")					// If Unown is your active Pokemon, don't use it
-			unownCount--;
-
-		int DEBUG = unownCount;
+		//int DEBUG = unownCount;
 
 		//cout << "\n\nACTIVE: " << activePokemon << "\nUnown Count: " << DEBUG << "\nShaymin Count: " << shayminCount << "\n\n";
 
 
 		//cout << "\n\n";
 
-		vileStartSequence(deck, hand, basics, priorities, pokemon, trainers, ifForest, unownCount, shayminCount);
-		vileStartSequence(deck, hand, basics, priorities, pokemon, trainers, ifForest, unownCount, shayminCount);
-
+		bool ifSupporter = false;
+		
+		if (vileStartSequence(deck, hand, basics, priorities, pokemon, trainers, ifForest, unownCount, shayminCount))
+			success++;
+			
 		/*
 		cout << "\n";
 		for (int i = 0; i < priorities.size(); i++)			// DEBUG: Outputs the priority vector
@@ -462,72 +424,107 @@ int vileSetup(vector<string> &deck, vector<string> &hand, vector<string> &basics
 
 	cout << "\rDone!                                             \n";
 
+	cout << "Turn one Vileplume was achieved " << success << " times out of " << trials << " trials (" << float(success) * 100 / float(trials) << "%)\n";
+
 	return 0;
 }
 
 int vileStartSequence(vector<string> &deck, vector<string> &hand, vector<string> &basics, vector<string> &priorities, vector<string> &pokemon, vector<string> &trainers, bool &ifForest, int &unownCount, int& shayminCount)
+
 {
-	for (int i = 0; i < unownCount; unownCount--)					// Play all benched Unowns to start off
-		draw(deck, hand);
+	bool supporter = false;
+startt:
 
-	if (checkHand(hand, "Acro_Bike"))
-		acroBike(deck, hand, priorities);
+		for (int i = 0; i < unownCount; unownCount--)					// Play all benched Unowns to start off
+			draw(deck, hand);
 
-	if (checkHand(hand, "Trainers_Mail"))
-		trainersMail(deck, hand, trainers);
+		if (checkHand(hand, "Acro_Bike"))
+			acroBike(deck, hand, priorities);
 
-	if (play("Forest_Of_Giant_Plants", hand) && !ifForest)			// Play down Forest if one is not already played
+		if (checkHand(hand, "Trainers_Mail"))
+			trainersMail(deck, hand, trainers);
+
+
+		if (play("Forest_Of_Giant_Plants", hand) && !ifForest)			// Play down Forest if one is not already played
+		{
+			hand.erase(hand.begin() + play("Forest_Of_Giant_Plants", hand));
+			priorities.erase(remove(priorities.begin(), priorities.end(), "Forest_Of_Giant_Plants"), priorities.end());
+			ifForest = true;
+		}
+
+		/*Play
+		if (ifForest)													// DEBUG: If IFFOREST = TRUE
+		cout << "IF FOREST IS TRUE";
+		else
+		cout << "IF FOREST IS FALSE";
+		*/
+
+		if (ifForest)
+		{
+
+			if (checkHand(hand, "Level_Ball") && pokemon.size() == 2)
+			{
+				levelBall(deck, hand, pokemon);
+				hand.erase(hand.begin() + checkHand(hand, "Level_Ball") - 1);
+			}
+
+			else if (checkHand(hand, "Level_Ball") && pokemon.size() == 1)
+				for (int i = 0; i < deck.size(); i++)
+					if (deck[i] == "Unown_AOR")								// If an Unown is in the deck and Oddish and Gloom are on the field, skip the crap and draw a card
+					{
+						deck.erase(deck.begin() + i);
+						hand.erase(hand.begin() + checkHand(hand, "Level_Ball") - 1);
+						random_shuffle(deck.begin(), deck.end());		// Shuffles the deck afterwards :]
+						draw(deck, hand);
+						break;
+					}
+		}
+
+		if (checkHand(hand, "Ultra_Ball") && !checkHand(hand, "Professor_Sycamore") && !checkHand(hand, "N") && !checkHand(hand, "Ultra_Ball"))
+		{
+			ultraBall(deck, hand, priorities, "Shaymin-EX_ROS");
+		}
+
+		if (checkHand(hand, "Ultra_Ball") && (checkHand(hand, "Professor_Sycamore") || checkHand(hand, "N") || checkHand(hand, "Ultra_Ball")))
+		{
+			ultraBall(deck, hand, priorities, pokemon[pokemon.size() - 1]);
+		}
+
+		if (checkHand(hand, "Shaymin-EX_ROS"))
+		{
+			shaymin(deck, hand);
+		}
+
+		if (ifForest)
+		{
+			//cout << "FOREST IS ACTIVE AHHHHHHH";						// DEBUG: Rage I guess
+			if (checkHand(hand, "Gloom_AOR"))	// Evolve Oddish into Gloom if you have Gloom and there is an Oddish on the field
+			{
+				//system("pause");										// DEBUG: Pauses when Gloom set up is in starting hand
+				pokemon.pop_back();
+				priorities.erase(remove(priorities.begin(), priorities.end(), "Gloom_AOR"), priorities.end());
+			}
+
+			if (checkHand(hand, "Vileplume_AOR"))// Evolve Gloom into Vileplume if you have 
+			{
+				//system("pause");										// DEBUG: Pauses when Vileplume set up is in starting hand
+				return 1;
+			}
+		}
+
+	if (checkHand(hand, "Professor_Sycamore") && !supporter)
 	{
-		hand.erase(hand.begin() + play("Forest_Of_Giant_Plants", hand));
-		priorities.erase(remove(priorities.begin(), priorities.end(), "Forest_Of_Giant_Plants"), priorities.end());
-		ifForest = true;
+		sycamore(deck, hand);
+		supporter = true;
+		goto startt;
 	}
 
-	/*Play
-	if (ifForest)													// DEBUG: If IFFOREST = TRUE
-	cout << "IF FOREST IS TRUE";
-	else
-	cout << "IF FOREST IS FALSE";
-	*/
-
-	if (ifForest)
+	if (checkHand(hand, "N") && !supporter)
 	{
-		if (checkHand(hand, "Level_Ball") && pokemon.size() == 2)
-		{
-			levelBall(deck, hand, pokemon);
-			hand.erase(hand.begin() + checkHand(hand, "Level_Ball") - 1);
-		}
-
-		else if (checkHand(hand, "Level_Ball") && pokemon.size() == 1)
-			for (int i = 0; i < deck.size(); i++)
-				if (deck[i] == "Unown_AOR")								// If an Unown is in the deck and Oddish and Gloom are on the field, skip the crap and draw a card
-				{
-					deck.erase(deck.begin() + i);
-					hand.erase(hand.begin() + checkHand(hand, "Level_Ball") - 1);
-					random_shuffle(deck.begin(), deck.end());		// Shuffles the deck afterwards :]
-					draw(deck, hand);
-					break;
-				}
-		//cout << "FOREST IS ACTIVE AHHHHHHH";						// DEBUG: Rage I guess
-		if (checkHand(hand, "Gloom_AOR") && pokemon.size() == 2)	// Evolve Oddish into Gloom if you have Gloom and there is an Oddish on the field
-		{
-			//system("pause");										// DEBUG: Pauses when Gloom set up is in starting hand
-			pokemon.pop_back();
-			priorities.erase(remove(priorities.begin(), priorities.end(), "Gloom_AOR"), priorities.end());
-		}
-
-		if (checkHand(hand, "Vileplume_AOR") && pokemon.size() == 1)// Evolve Gloom into Vileplume if you have 
-		{
-			//system("pause");										// DEBUG: Pauses when Vileplume set up is in starting hand
-			return 1;
-		}
+		n(deck, hand);
+		supporter = true;
+		goto startt;
 	}
-
-	if (checkHand(hand, "Ultra_Ball") && !checkHand(hand, "Professor_Sycamore") && !checkHand(hand, "N") && !checkHand(hand, "Ultra_Ball"))
-		ultraBall(deck, hand, priorities, "Shaymin-EX_ROS");
-
-	if (checkHand(hand, "Ultra_Ball") && (checkHand(hand, "Professor_Sycamore") || checkHand(hand, "N") || checkHand(hand, "Ultra_Ball")))
-		ultraBall(deck, hand, priorities, pokemon[pokemon.size - 1]);
-
+		
 	return 0;
 }
